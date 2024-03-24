@@ -23,7 +23,14 @@ FUNCTION DECLARATION
 void businessLogic(String content);
 void outputToLcd();
 void acknowledgeRead();
+void outputAccessToLcd();
+void addingNewProduct(String product_name, byte product_price);
+void removeProduct(String product_name, byte product_price);
+void assignValues(String product, byte price);
+void lowFunds();
+void startUpMsg();
 void billPaid();
+void do_default_check();
 void resetParams();
 void welcomeMsg();
  
@@ -171,9 +178,9 @@ for(byte i = 0; i < product_prices.Size();i++){
 //  lcd.print(product_price + " deducted from total amount");
 }
 
-void assignValues(String product,byte value){
+void assignValues(String product,byte price){
    product_name = product;
-   product_price = value;
+   product_price = price;
 }
 
 void lowFunds(){
