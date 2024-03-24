@@ -15,9 +15,23 @@ MFRC522::MIFARE_Key key;
 MFRC522::StatusCode status;
 // Defined pins to module RC522
 MFRC522 mfrc522(SS_PIN, RST_PIN); 
+
+/*
+FUNCTION DECLARATION
+*/
+
+void businessLogic(String content);
+void outputToLcd();
+void acknowledgeRead();
+void billPaid();
+void resetParams();
+void welcomeMsg();
  
-// Create the lcd object address 0x3F and 16 columns x 2 rows 
-//LiquidCrystal_I2C lcd (0x27, 16,2);  //
+//LiquidCrystal_I2C lcd (0x27, 16,2);
+
+/*
+GLOBAL VARIABLES
+*/
 
 String product_name = "";
 byte product_price, sum = 0;
@@ -29,22 +43,15 @@ int balance = 0;
 int buzzer = 8;
 Vector<byte> product_prices; 
 
-void businessLogic(String content);
-void outputToLcd();
-void acknowledgeRead();
-void billPaid();
-void resetParams();
+
 
 void  setup () {
   Serial.begin(115200);
-//  lcd.init();
-  
-  // Turn on the backlight on LCD. 
-//  lcd.backlight ();
-//  lcd.print(" welcome ");
-//  // print the Message on the LCD.
-//  lcd.setCursor(0,1); 
-//  lcd.print ( "Shopping Cart" );
+
+//  lcd.init(); 
+
+//  welcomeMsg();
+
   while(!Serial);
   // Init MFRC522
   SPI.begin();
@@ -66,7 +73,7 @@ void  loop () {
    }
  
    // Select one of the cards
-   if ( ! mfrc522.PICC_ReadCardSerial()) 
+   if (! mfrc522.PICC_ReadCardSerial()) 
    {
       return;
    }
@@ -86,9 +93,20 @@ void  loop () {
    Serial.println();
    Serial.print("Message : ");
    content.toUpperCase();
-   Serial.println("Before");
    businessLogic(content);
-   Serial.println("After");
+}
+
+
+/*
+FUNCTION DEFINITIONS
+*/
+
+void welcomeMsg(){
+//  lcd.backlight ();
+//  lcd.print(" welcome ");
+//  // print the Message on the LCD.
+//  lcd.setCursor(0,1); 
+//  lcd.print ( "Shopping Cart" );  
 }
 
 void acknowledgeRead(){
@@ -189,7 +207,7 @@ void businessLogic(String content){
            }
            
    }
-   if (content.substring(1) == "A3 7F FD 16") //change here the UID of the card/cards that you want to give access
+   if ( content.substring(1) == "A3 7F FD 16" ) //change here the UID of the card/cards that you want to give access
    {
 //          acknowledgeRead();
      assignValues("bread", 10);
@@ -208,63 +226,35 @@ void businessLogic(String content){
 //            delay(1000);
 //          }
 
-   if (content.substring(1) == "35 3C 16 AD") //change here the UID of the card/cards that you want to give access
-   {
+   if (content.substring(1) == "35 3C 16 AD"){
 //          acknowledgeRead();
           
-    balance = amount - sum;
-//               for(int i=0;i<6;i++)
-//               {
-//               digitalWrite(buz, HIGH);
-//               delay(70);
-//               digitalWrite(buz, LOW);
-//               delay(70);
-//               
-//               }
-          
-         // restore the prices collection to empty
+      balance = amount - sum;
       if(sum != 0){
         Serial.println(amount);
             if ((balance) >= 0 ){ 
               billPaid();
               delay(2000);
               delay(2000);
-  
               resetParams();
-          }
-          else{
-            lowFunds();
-          }
-        } 
+            }
+            else{
+              lowFunds();
+            }
+       } 
         else {
-//          lcd.clear();                 // clear display
+//          lcd.clear();
 //          lcd.setCursor(0, 0);
 //          lcd.print("   Cart empty");
-          delay(3000);
-          startUpMsg();
-        }
-          //                //Serial.println("Bill Paid thankyou for shopping ");
-          //                 lcd.setCursor(0, 0);
-          //                 lcd.print(" Smart Shopping ");
-          //                 lcd.setCursor(0, 1);
-          //                 lcd.print("   trolly ");
-          //                 delay(200);      
-   }
-                          
-                          
-                
-          //                 lcd.clear();
-          //                 lcd.setCursor(0, 0);
-          //                 lcd.print("Bill amount Rs: ");
-          //                 lcd.setCursor(0, 1);
-          //                 lcd.print(s);
-          //                 Serial.println("total amount is: " +findTotalAmountPayable(product_prices));
-          //                 delay(100);
-   do_default_check();       
+            delay(3000);
+            startUpMsg();
+        }     
+    }
+    
+    do_default_check();       
 }
 
 void do_default_check() {
-  Serial.println("IN DEFAULT CHECK");
   for(byte i =0; i < product_prices.Size(); i++){
     Serial.println(product_prices[i]);
     sum = sum + product_prices[i];
